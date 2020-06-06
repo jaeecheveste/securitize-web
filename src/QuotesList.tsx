@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import TableComponent from "./shared/TableComponent";
 import PaginationComponent from "./shared/PaginationComponent";
 import { getQuotes } from "./api/quotesService";
-
-const QuotesList = ({ onAddFavorites }: any) => {
+import { buildQueryParams } from "./api/queryBuilder";
+import "./QuotesList.scss";
+const QuotesList = ({ onClickFavorites, favorites }: any) => {
   //Start: Read from CMS
   const columns = [
     {
@@ -11,7 +12,7 @@ const QuotesList = ({ onAddFavorites }: any) => {
       title: "Name"
     },
     {
-      key: "marketPrice",
+      key: "price",
       title: "Market Price"
     },
     {
@@ -29,43 +30,53 @@ const QuotesList = ({ onAddFavorites }: any) => {
   const items = [1, 2, 3, 4, 5];
   //end CMS
 
-  const paginationItems = ["First", ...items, "Last"];
-  const itemsPerPage = 25;
+  //Pagination Config
+  const paginationItems = items;
+  const limit = 25;
   const defaultPage = 1;
-  const [activePage, setActivePage] = useState(defaultPage);
+  const [startPage, setStartPage] = useState(defaultPage);
 
   //Action to load Currencies
   const [cryptoList, setCryptoList] = useState([]);
+
   useEffect(() => {
-    // const getCryptoList = async () => {
-    //   const cryptoList = await getQuotes();
-    //   console.log("List", cryptoList);
-    // };
-    // getCryptoList();
-  }, [itemsPerPage, activePage]);
+    const getCryptoList = async () => {
+      try {
+        const response = await getQuotes(
+          buildQueryParams({ startPage, limit })
+        );
+
+        response.forEach((quote: any) => {
+          let fav = favorites.find((f: any) => f.id === quote.id);
+          if (fav) quote.liked = true;
+        });
+        setCryptoList(response);
+      } catch (e) {
+        //Show a toast
+      }
+    };
+    getCryptoList();
+  }, [startPage, limit]);
 
   //Replace any by types
   const onClickPaginate = (i: any) => {
     let activeIndex;
     activeIndex = +i;
 
-    if (i == "First") activeIndex = 1;
-    if (i == "Last") activeIndex = items.length;
-
-    setActivePage(activeIndex);
-    console.log("on click paginate", i);
+    setStartPage(activeIndex);
   };
 
   return (
     <>
-      <div className="title">Cryptocurrencies</div>
+      <h3>Cryptocurrencies</h3>
       <TableComponent
-        onClickAction={onAddFavorites}
+        list={cryptoList}
+        onClickAction={onClickFavorites}
         columns={columns}
         action={action}
       />
       <PaginationComponent
-        activePage={1}
+        activePage={startPage}
         items={paginationItems}
         onClickPaginate={onClickPaginate}
       />

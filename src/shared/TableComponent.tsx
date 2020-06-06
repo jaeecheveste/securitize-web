@@ -1,5 +1,7 @@
 import React from "react";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import "./TableComponent.scss";
 interface ColumnsSchema {
   key: string;
   title: string;
@@ -13,11 +15,23 @@ interface ActionSchema {
 
 interface TableSchema {
   columns: Array<ColumnsSchema>;
-  action: ActionSchema;
+  action?: ActionSchema;
+  list: Array<any>;
   onClickAction: (i: any) => any;
 }
 
-const TableComponent = ({ onClickAction, columns, action }: TableSchema) => {
+const TableComponent = ({
+  onClickAction,
+  columns,
+  action,
+  list
+}: TableSchema) => {
+  //Method repeated , make it generic
+
+  const getItemClasses = (liked: any) => {
+    return liked ? "heart-icon-btn--active" : "heart-icon-btn--inactive";
+  };
+
   return (
     <table>
       <thead>
@@ -29,16 +43,22 @@ const TableComponent = ({ onClickAction, columns, action }: TableSchema) => {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Bitcoin</td>
-          <td>600</td>
-          <td>Circulating Supply</td>
-          {action && (
-            <td>
-              <button onClick={() => onClickAction(1)}>ICON</button>
-            </td>
-          )}
-        </tr>
+        {list.length > 0 &&
+          list.map(item => (
+            <tr key={item.key}>
+              {columns.map((c: any) => (
+                <td key={c.key}>{item[c.key] || ""}</td>
+              ))}
+              {action && (
+                <td className={`heart-icon-btn ${getItemClasses(item.liked)}`}>
+                  <FontAwesomeIcon
+                    onClick={() => onClickAction(item)}
+                    icon={faHeart}
+                  />
+                </td>
+              )}
+            </tr>
+          ))}
       </tbody>
     </table>
   );

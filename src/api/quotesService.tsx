@@ -3,11 +3,12 @@ import axios from "axios";
 
 //should read this from dotenv
 const path = process.env.API_URL;
-const baseUrl = "localhost:4000" + "/quotes";
+const baseUrl = "http://localhost:7000/api/v1" + "/quotes";
 
-export async function getQuotes() {
+export async function getQuotes(params?: any) {
   try {
-    return await axios(baseUrl);
+    const response = await axios(`${baseUrl}${params}`);
+    return response.data;
   } catch (e) {
     handleError(e);
   }

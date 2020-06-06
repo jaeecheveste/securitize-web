@@ -1,0 +1,46 @@
+table {
+  border-spacing: 0;
+  width: 100%;
+
+  thead {
+    color: black;
+    font-size: 14px;
+
+    th {
+      font-weight: 500;
+    }
+  }
+
+  th,
+  td {
+    padding: 15px;
+    text-align: center;
+  }
+
+  tbody {
+    tr {
+      &:nth-child(odd) {
+        background: #f4f4f4;
+      }
+
+      td {
+        &.heart-icon-btn {
+          cursor: pointer;
+          &:hover {
+            color: red;
+          }
+          &--active {
+            color: red;
+          }
+          &--inactive {
+            color: gray;
+          }
+        }
+
+        &:first-child {
+          text-align: left;
+        }
+      }
+    }
+  }
+}
